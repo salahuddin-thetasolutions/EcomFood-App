@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.food.ecom.Helpers.Constants;
+import com.food.ecom.Http.ApiUtils;
 import com.food.ecom.R;
+import com.food.ecom.model.NotifyData;
+import com.food.ecom.model.Message;
 import com.food.ecom.model.Product;
 import com.food.ecom.product.ItemDetailsActivity;
 import com.food.ecom.startup.MainActivity;
@@ -27,6 +32,10 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static com.food.ecom.fragments.ProductListFragment.STRING_IMAGE_POSITION;
 import static com.food.ecom.fragments.ProductListFragment.STRING_IMAGE_URI;
 
@@ -35,6 +44,7 @@ public class CartListActivity extends AppCompatActivity {
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     ArrayList<Product> cartlistProduct;
+    RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +59,7 @@ public class CartListActivity extends AppCompatActivity {
         //Show cart layout based on items
         setCartLayout();
 
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recyclerview);
+        recyclerView = (RecyclerView)findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager recylerViewLayoutManager = new LinearLayoutManager(mContext);
 
         recyclerView.setLayoutManager(recylerViewLayoutManager);
@@ -204,10 +214,40 @@ public class CartListActivity extends AppCompatActivity {
             // do something with object
             ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
             mFirebaseDatabase.child(OrderId).child("Product"+i).setValue(oProduct);
-            //imageUrlUtils.removeCartListImageUri(i);
+            imageUrlUtils.removeCartListProduct(i);
             //Decrease notification count
-           // MainActivity.notificationCountCart--;
+            MainActivity.notificationCountCart--;
         }
-        Toast.makeText(mContext, "Successfully Checkout", Toast.LENGTH_SHORT).show();
+        ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
+        cartlistProduct =imageUrlUtils.getCartListProduct();
+        recyclerView.setAdapter(new CartListActivity.SimpleStringRecyclerViewAdapter(recyclerView, cartlistProduct));
+        //notifyDataSetChanged();
+//        notifyAll();
+       // Toast.makeText(mContext, "Successfully Checkout", Toast.LENGTH_SHORT).show();
+        SendNotification(token,"Order Status","Successfully CheckOut");
+    }
+
+    private void SendNotification(String token,String title,String Message) {
+        NotifyData oNotifyData=new NotifyData(title,Message);
+        Message oMessage=new Message(token,oNotifyData,"");
+        Call<Message> callresponse= ApiUtils.getAPIService(Constants.BASEURLFCM).sendMessage(oMessage);
+        callresponse.enqueue(new Callback<Message>() {
+            @Override
+            public void onResponse(Call<Message> call, Response<Message> response) {
+
+                Log.d("Response ", "onResponse");
+                //t1.setText("Notification sent");
+                Message message = response.body();
+                if ( response.code()==201){
+                    Toast.makeText(CartListActivity.this, "Successfully send", Toast.LENGTH_SHORT).show();
+                }
+                // Log.d("message", message.getMessage_id());
+            }
+            @Override
+            public void onFailure(Call<Message> call, Throwable t) {
+                Log.d("Response ", "onFailure");
+                //t1.setText("Notification failure");
+            }
+        });
     }
 }
