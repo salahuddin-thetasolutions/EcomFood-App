@@ -170,7 +170,7 @@ public class CartListActivity extends AppCompatActivity {
             layoutCartPayments.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(CartListActivity.this, "Payment", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CartListActivity.this, "Your Order has been successfully Checkout", Toast.LENGTH_SHORT).show();
                     CreateOrder();
 
                 }
