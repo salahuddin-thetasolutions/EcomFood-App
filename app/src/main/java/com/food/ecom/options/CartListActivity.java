@@ -212,19 +212,24 @@ public class CartListActivity extends AppCompatActivity {
             Product oProduct = cartlistProduct.get(i);
             //do something with i
             // do something with object
-            ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
+            //ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
             mFirebaseDatabase.child(OrderId).child("Product"+i).setValue(oProduct);
-            imageUrlUtils.removeCartListProduct(i);
+           // imageUrlUtils.removeCartListProduct(i);
             //Decrease notification count
             MainActivity.notificationCountCart--;
         }
         ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
-        cartlistProduct =imageUrlUtils.getCartListProduct();
-        recyclerView.setAdapter(new CartListActivity.SimpleStringRecyclerViewAdapter(recyclerView, cartlistProduct));
+        imageUrlUtils.removeCartListAllProducts();
+        MainActivity.notificationCountCart=0;
+        //ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
+        //cartlistProduct =imageUrlUtils.getCartListProduct();
+        //recyclerView.setAdapter(new CartListActivity.SimpleStringRecyclerViewAdapter(recyclerView, cartlistProduct));
         //notifyDataSetChanged();
 //        notifyAll();
        // Toast.makeText(mContext, "Successfully Checkout", Toast.LENGTH_SHORT).show();
-        SendNotification(token,"Order Status","Successfully CheckOut");
+        SendNotification(token,"Order Status","Your Order has been successfully Checkout");
+        Intent intent = new Intent(CartListActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void SendNotification(String token,String title,String Message) {

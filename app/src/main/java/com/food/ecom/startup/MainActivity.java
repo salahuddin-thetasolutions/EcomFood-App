@@ -13,15 +13,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.food.ecom.R;
 import com.food.ecom.fragments.ProductListFragment;
 import com.food.ecom.miscellaneous.EmptyActivity;
+import com.food.ecom.model.Product;
 import com.food.ecom.notification.NotificationCountSetClass;
 import com.food.ecom.options.CartListActivity;
 import com.food.ecom.options.SearchResultActivity;
 import com.food.ecom.options.WishlistActivity;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +36,9 @@ public class MainActivity extends AppCompatActivity
     public static int notificationCountCart = 0;
     static ViewPager viewPager;
     static TabLayout tabLayout;
-
+    private DatabaseReference mFirebaseDatabaseProducts;
+    private DatabaseReference mFirebaseDatabaseCategory;
+    private FirebaseDatabase mFirebaseInstance;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +72,60 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });*/
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+
+        // get reference to 'users' node
+        mFirebaseDatabaseProducts = mFirebaseInstance.getReference("Products");
+        mFirebaseDatabaseCategory = mFirebaseInstance.getReference("Categories");
+     // SaveProduct();
+    }
+
+    private void SaveProduct() {
+        //Product1
+        String  ProductId = mFirebaseDatabaseProducts.push().getKey();
+        Product op1=new Product();
+        op1.setName("item 1");
+        op1.setDescription("description 1");
+        op1.setImage("https://static.pexels.com/photos/5854/sea-woman-legs-water-medium.jpg");
+        op1.setPriceString("Rs. 1000");
+        op1.setPrice((double)1000);
+        op1.setCategory("item 1");
+        op1.setCategoryType(1);
+        mFirebaseDatabaseProducts.child(ProductId).setValue(op1);
+        //Product2
+        String  ProductId2 = mFirebaseDatabaseProducts.push().getKey();
+        Product op2=new Product();
+        op2.setName("item 2");
+        op2.setDescription("description 2");
+        op2.setImage("https://static.pexels.com/photos/6245/kitchen-cooking-interior-decor-medium.jpg");
+        op2.setPriceString("Rs. 4000");
+        op2.setPrice((double)4000);
+        op2.setCategory("item 2");
+        op2.setCategoryType(2);
+        mFirebaseDatabaseProducts.child(ProductId2).setValue(op2);
+        //Product3
+        String  ProductId3 = mFirebaseDatabaseProducts.push().getKey();
+        Product op3=new Product();
+        op3.setName("item 3");
+        op3.setDescription("description 2");
+        op3.setImage("https://static.pexels.com/photos/6245/kitchen-cooking-interior-decor-medium.jpg");
+        op3.setPriceString("Rs. 5000");
+        op3.setPrice((double)5000);
+        op3.setCategory("item 3");
+        op3.setCategoryType(3);
+        mFirebaseDatabaseProducts.child(ProductId3).setValue(op3);
+        //Product4
+        String  ProductId4 = mFirebaseDatabaseProducts.push().getKey();
+        Product op4=new Product();
+        op4.setName("item 4");
+        op4.setDescription("description 2");
+        op4.setImage("https://static.pexels.com/photos/6245/kitchen-cooking-interior-decor-medium.jpg");
+        op4.setPriceString("Rs. 6000");
+        op4.setPrice((double)6000);
+        op4.setCategory("More");
+        op4.setCategoryType(4);
+        mFirebaseDatabaseProducts.child(ProductId4).setValue(op4);
+
     }
 
     @Override

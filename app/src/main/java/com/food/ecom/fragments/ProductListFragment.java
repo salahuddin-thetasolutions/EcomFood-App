@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,21 +36,36 @@ import com.food.ecom.product.ItemDetailsActivity;
 import com.food.ecom.startup.MainActivity;
 import com.food.ecom.utility.ImageUrlUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import static android.content.ContentValues.TAG;
+
 
 public class ProductListFragment extends Fragment {
-
     public static final String ProductObj = "ProductObj";
    public static final String STRING_IMAGE_POSITION = "ImagePosition";
     public static final String STRING_IMAGE_URI = "ImageURI";
     private static MainActivity mActivity;
-
+    private DatabaseReference mFirebaseDatabaseProducts;
+    private DatabaseReference mFirebaseDatabaseCategory;
+    private FirebaseDatabase mFirebaseInstance;
+    ArrayList<Product> mFirebaseProducts;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = (MainActivity) getActivity();
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+
+        // get reference to 'users' node
+        mFirebaseDatabaseProducts = mFirebaseInstance.getReference("Products");
+        mFirebaseProducts=new ArrayList<>();
+        GetAllProducts();
     }
 
     @Override
@@ -72,45 +88,14 @@ public class ProductListFragment extends Fragment {
         }*/
         ArrayList<Product> items=null;
         if (ProductListFragment.this.getArguments().getInt("type") == 1){
-            ArrayList<Product> oListItem1=new ArrayList<>();
-            Product op1=new Product();
-            op1.setName("item 1");
-            op1.setDescription("description 1");
-            op1.setImage("https://static.pexels.com/photos/5854/sea-woman-legs-water-medium.jpg");
-            op1.setPriceString("Rs. 1000");
-            op1.setPrice((double)1000);
-            oListItem1.add(op1);
-            items=oListItem1;
+
+            items=FilterByType(1);
         }else if (ProductListFragment.this.getArguments().getInt("type") == 2){
-            ArrayList<Product> oListItem2=new ArrayList<>();
-            Product op1=new Product();
-            op1.setName("item 2");
-            op1.setDescription("description 2");
-            op1.setImage("https://static.pexels.com/photos/6245/kitchen-cooking-interior-decor-medium.jpg");
-            op1.setPriceString("Rs. 5000");
-            op1.setPrice((double)5000);
-            oListItem2.add(op1);
-            items=oListItem2;
+            items=FilterByType(2);
         }else if (ProductListFragment.this.getArguments().getInt("type") == 3){
-            ArrayList<Product> oListItem2=new ArrayList<>();
-            Product op1=new Product();
-            op1.setName("item 2");
-            op1.setDescription("description 2");
-            op1.setImage("https://static.pexels.com/photos/5854/sea-woman-legs-water-medium.jpg");
-            op1.setPriceString("Rs. 6000");
-            op1.setPrice((double)6000);
-            oListItem2.add(op1);
-            items=oListItem2;
+            items=FilterByType(3);
         }else {
-            ArrayList<Product> oListmore=new ArrayList<>();
-            Product op1=new Product();
-            op1.setName("item more");
-            op1.setDescription("description more");
-            op1.setImage("https://static.pexels.com/photos/5854/sea-woman-legs-water-medium.jpg");
-            op1.setPriceString("Rs. 1000");
-            op1.setPrice((double)1000);
-            oListmore.add(op1);
-            items=oListmore;
+            items=FilterByType(4);
         }
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -209,5 +194,39 @@ public class ProductListFragment extends Fragment {
         public int getItemCount() {
             return mValues.size();
         }
+    }
+    //  List get
+    private void GetAllProducts() {
+        // User data change listener
+        mFirebaseDatabaseProducts.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<Product> oListUser=new ArrayList<>();
+                for (DataSnapshot snapshot:dataSnapshot.getChildren())
+                {
+                    String key= snapshot.getKey();
+                    Product oProduct = snapshot.getValue(Product.class);
+                    mFirebaseProducts.add(oProduct);
+                }
+                Object dataSnapshotsChat = dataSnapshot.getValue();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.e(TAG, "Failed to read user", error.toException());
+            }
+        });
+    }
+
+    public ArrayList<Product> FilterByType(int Type){
+        ArrayList<Product> oListByFilter=new ArrayList<>();
+        for(Product item: mFirebaseProducts){
+            if(item.getCategoryType()==Type){
+                oListByFilter.add(item);
+            }
+        }
+        return  oListByFilter;
     }
 }

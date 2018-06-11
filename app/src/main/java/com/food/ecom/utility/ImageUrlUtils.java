@@ -263,4 +263,7 @@ public class ImageUrlUtils {
     public void removeCartListProduct(int position) {
         this.cartListProducts.remove(position);
     }
+    public void removeCartListAllProducts() {
+        this.cartListProducts = new ArrayList<>();
+    }
 }
