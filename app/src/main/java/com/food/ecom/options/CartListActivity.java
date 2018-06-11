@@ -218,9 +218,7 @@ public class CartListActivity extends AppCompatActivity {
             //Decrease notification count
             MainActivity.notificationCountCart--;
         }
-        ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
-        imageUrlUtils.removeCartListAllProducts();
-        MainActivity.notificationCountCart=0;
+
         //ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
         //cartlistProduct =imageUrlUtils.getCartListProduct();
         //recyclerView.setAdapter(new CartListActivity.SimpleStringRecyclerViewAdapter(recyclerView, cartlistProduct));
@@ -228,6 +226,9 @@ public class CartListActivity extends AppCompatActivity {
 //        notifyAll();
        // Toast.makeText(mContext, "Successfully Checkout", Toast.LENGTH_SHORT).show();
         SendNotification(token,"Order Status","Your Order has been successfully Checkout");
+        ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
+        imageUrlUtils.removeCartListAllProducts();
+        MainActivity.notificationCountCart=0;
         Intent intent = new Intent(CartListActivity.this, MainActivity.class);
         startActivity(intent);
     }
