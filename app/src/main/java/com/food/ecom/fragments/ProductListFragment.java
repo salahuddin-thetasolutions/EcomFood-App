@@ -56,26 +56,30 @@ public class ProductListFragment extends Fragment {
     private DatabaseReference mFirebaseDatabaseCategory;
     private FirebaseDatabase mFirebaseInstance;
     ArrayList<Product> mFirebaseProducts;
+    ArrayList<Product> items=null;
+    RecyclerView recyclerView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         mActivity = (MainActivity) getActivity();
+       // GetAllProducts();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        recyclerView = (RecyclerView) inflater.inflate(R.layout.layout_recylerview_list, container, false);
+        setupRecyclerView();
+        return recyclerView;
+    }
+
+    private void setupRecyclerView() {
         mFirebaseInstance = FirebaseDatabase.getInstance();
 
         // get reference to 'users' node
         mFirebaseDatabaseProducts = mFirebaseInstance.getReference("Products");
         mFirebaseProducts=new ArrayList<>();
         GetAllProducts();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        RecyclerView rv = (RecyclerView) inflater.inflate(R.layout.layout_recylerview_list, container, false);
-        setupRecyclerView(rv);
-        return rv;
-    }
-
-    private void setupRecyclerView(RecyclerView recyclerView) {
       /*  if (ImageListFragment.this.getArguments().getInt("type") == 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         } else if (ImageListFragment.this.getArguments().getInt("type") == 2) {
@@ -86,7 +90,7 @@ public class ProductListFragment extends Fragment {
             layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             recyclerView.setLayoutManager(layoutManager);
         }*/
-        ArrayList<Product> items=null;
+
         if (ProductListFragment.this.getArguments().getInt("type") == 1){
 
             items=FilterByType(1);
@@ -209,6 +213,8 @@ public class ProductListFragment extends Fragment {
                     mFirebaseProducts.add(oProduct);
                 }
                 Object dataSnapshotsChat = dataSnapshot.getValue();
+                items=FilterByType(1);
+                recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(recyclerView, items));
 
             }
 
