@@ -78,7 +78,7 @@ public class ProductListFragment extends Fragment {
 
         // get reference to 'users' node
         mFirebaseDatabaseProducts = mFirebaseInstance.getReference("Products");
-        mFirebaseProducts=new ArrayList<>();
+        //mFirebaseProducts=new ArrayList<>();
         GetAllProducts();
       /*  if (ImageListFragment.this.getArguments().getInt("type") == 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
@@ -91,19 +91,19 @@ public class ProductListFragment extends Fragment {
             recyclerView.setLayoutManager(layoutManager);
         }*/
 
-        if (ProductListFragment.this.getArguments().getInt("type") == 1){
-
-            items=FilterByType(1);
-        }else if (ProductListFragment.this.getArguments().getInt("type") == 2){
-            items=FilterByType(2);
-        }else if (ProductListFragment.this.getArguments().getInt("type") == 3){
-            items=FilterByType(3);
-        }else {
-            items=FilterByType(4);
-        }
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(recyclerView, items));
+//        if (ProductListFragment.this.getArguments().getInt("type") == 1){
+//
+//            items=FilterByType(1);
+//        }else if (ProductListFragment.this.getArguments().getInt("type") == 2){
+//            items=FilterByType(2);
+//        }else if (ProductListFragment.this.getArguments().getInt("type") == 3){
+//            items=FilterByType(3);
+//        }else {
+//            items=FilterByType(4);
+//        }
+//        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+//        recyclerView.setLayoutManager(layoutManager);
+//        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(recyclerView, items));
     }
 
     public static class SimpleStringRecyclerViewAdapter
@@ -205,7 +205,7 @@ public class ProductListFragment extends Fragment {
         mFirebaseDatabaseProducts.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                ArrayList<Product> oListUser=new ArrayList<>();
+                mFirebaseProducts=new ArrayList<>();
                 for (DataSnapshot snapshot:dataSnapshot.getChildren())
                 {
                     String key= snapshot.getKey();
@@ -213,9 +213,19 @@ public class ProductListFragment extends Fragment {
                     mFirebaseProducts.add(oProduct);
                 }
                 Object dataSnapshotsChat = dataSnapshot.getValue();
-                items=FilterByType(1);
-                recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(recyclerView, items));
+                if (ProductListFragment.this.getArguments().getInt("type") == 1){
 
+                    items=FilterByType(1);
+                }else if (ProductListFragment.this.getArguments().getInt("type") == 2){
+                    items=FilterByType(2);
+                }else if (ProductListFragment.this.getArguments().getInt("type") == 3){
+                    items=FilterByType(3);
+                }else {
+                    items=FilterByType(4);
+                }
+                StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+                recyclerView.setLayoutManager(layoutManager);
+                recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(recyclerView, items));
             }
 
             @Override
