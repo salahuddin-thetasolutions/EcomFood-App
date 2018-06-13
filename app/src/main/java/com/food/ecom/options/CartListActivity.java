@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.food.ecom.Helpers.Constants;
+import com.food.ecom.Helpers.CustomDialog;
 import com.food.ecom.Http.ApiUtils;
 import com.food.ecom.R;
 import com.food.ecom.model.NotifyData;
@@ -171,7 +172,12 @@ public class CartListActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Toast.makeText(CartListActivity.this, "Your Order has been successfully Checkout", Toast.LENGTH_SHORT).show();
-                    CreateOrder();
+                    CustomDialog dialog=new CustomDialog(CartListActivity.this);
+                    dialog.show();
+                    // the following LOC will change the default layout width height to following .. default is very small.. i don't like.
+                    dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    //CreateOrder();
 
                 }
             });
@@ -193,7 +199,7 @@ public class CartListActivity extends AppCompatActivity {
     /**
      * Creating new user node under 'users'
      */
-    private void CreateOrder() {
+    private  void CreateOrder() {
         String token = FirebaseInstanceId.getInstance().getToken();
         // TODO
         // In real apps this userId should be fetched

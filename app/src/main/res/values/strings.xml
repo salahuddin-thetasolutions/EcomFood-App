@@ -71,4 +71,7 @@
 
     <string name="msg_subscribed">Subscribed to news topic</string>
     <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
+    <string name="DialogBoxText1">Do you want to Exit?</string>
+    <string name="DialogBoxText2">Checkout Detail</string>
+
 </resources>
