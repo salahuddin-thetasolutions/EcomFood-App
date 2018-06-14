@@ -33,16 +33,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Name"
+            android:maxLength="50"
+            android:singleLine="true"
             android:id="@+id/etName"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:maxLength="35"
+            android:singleLine="true"
             android:id="@+id/etEmail"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Phone"
+            android:inputType="phone"
+            android:singleLine="true"
+            android:maxLength="20"
             android:id="@+id/etPhone"/>
         <EditText
             android:layout_width="match_parent"
@@ -68,11 +76,11 @@
             <Button
                 android:id="@+id/NegativeBTN"
                 style="@style/AlertDialogButtonStyle"
-                android:text="No"/>
+                android:text="Cancel"/>
             <Button
                 android:id="@+id/PositveBTN"
                 style="@style/AlertDialogButtonStyle"
-                android:text="Yes"/>
+                android:text="Confirm"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -16,6 +16,7 @@
 
 package com.food.ecom.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -58,6 +59,7 @@ public class ProductListFragment extends Fragment {
     ArrayList<Product> mFirebaseProducts;
     ArrayList<Product> items=null;
     RecyclerView recyclerView;
+    ProgressDialog progressDialog;
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -74,6 +76,12 @@ public class ProductListFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("loading...");
+        progressDialog.setTitle("Please Wait");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         mFirebaseInstance = FirebaseDatabase.getInstance();
 
         // get reference to 'users' node
@@ -226,12 +234,13 @@ public class ProductListFragment extends Fragment {
                 StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 recyclerView.setLayoutManager(layoutManager);
                 recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(recyclerView, items));
+                progressDialog.dismiss();
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.e(TAG, "Failed to read user", error.toException());
+                Log.e(TAG, "Failed", error.toException());
             }
         });
     }

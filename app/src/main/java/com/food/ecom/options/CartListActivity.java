@@ -44,15 +44,16 @@ public class CartListActivity extends AppCompatActivity {
     private static Context mContext;
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
-    ArrayList<Product> cartlistProduct;
+   static ArrayList<Product> cartlistProduct;
     RecyclerView recyclerView;
+    static TextView mtvPrice;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart_list);
         mContext = CartListActivity.this;
         mFirebaseInstance = FirebaseDatabase.getInstance();
-
+        mtvPrice=(TextView)findViewById(R.id.text_action_bottom1);
         // get reference to 'users' node
         mFirebaseDatabase = mFirebaseInstance.getReference("Orders");
         ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
@@ -65,6 +66,7 @@ public class CartListActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(recylerViewLayoutManager);
         recyclerView.setAdapter(new CartListActivity.SimpleStringRecyclerViewAdapter(recyclerView, cartlistProduct));
+        SetTotalPrice();
     }
 
     public static class SimpleStringRecyclerViewAdapter
@@ -137,11 +139,11 @@ public class CartListActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
-                    imageUrlUtils.removeCartListImageUri(position);
+                    imageUrlUtils.removeCartListProduct(position);
                     notifyDataSetChanged();
                     //Decrease notification count
                     MainActivity.notificationCountCart--;
-
+                    CartListActivity.SetTotalPrice();
                 }
             });
 
@@ -171,14 +173,14 @@ public class CartListActivity extends AppCompatActivity {
             layoutCartPayments.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(CartListActivity.this, "Your Order has been successfully Checkout", Toast.LENGTH_SHORT).show();
-                    CustomDialog dialog=new CustomDialog(CartListActivity.this);
-                    dialog.show();
-                    // the following LOC will change the default layout width height to following .. default is very small.. i don't like.
-                    dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                    //CreateOrder();
-
+                    if(cartlistProduct!=null) {
+                        CustomDialog dialog = new CustomDialog(CartListActivity.this);
+                        dialog.show();
+                        // the following LOC will change the default layout width height to following .. default is very small.. i don't like.
+                        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    }else{
+                        Toast.makeText(CartListActivity.this, "Your cart is empty", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }else {
@@ -196,70 +198,79 @@ public class CartListActivity extends AppCompatActivity {
 
         }
     }
+    public static void SetTotalPrice(){
+        double sum = 0;
+        for(int i = 0; i < cartlistProduct.size(); i++)
+        {
+            Product oProduct=cartlistProduct.get(i);
+            sum += oProduct.getPrice();
+        }
+        mtvPrice.setText("Rs- "+ Math.round(sum)+"");
+    }
     /**
      * Creating new user node under 'users'
      */
-    private  void CreateOrder() {
-        String token = FirebaseInstanceId.getInstance().getToken();
-        // TODO
-        // In real apps this userId should be fetched
-        // by implementing firebase auth
-      String  OrderId = mFirebaseDatabase.push().getKey();
-        if (TextUtils.isEmpty(OrderId)) {
-            OrderId = mFirebaseDatabase.push().getKey();
-        }
-        mFirebaseDatabase.child(OrderId).child("User").child("name").setValue("Ali");
-        mFirebaseDatabase.child(OrderId).child("User").child("Email").setValue("abc@gmail.com");
-        mFirebaseDatabase.child(OrderId).child("User").child("Phone").setValue("0095522555");
-        mFirebaseDatabase.child(OrderId).child("User").child("Address").setValue("XYZ");
-        mFirebaseDatabase.child(OrderId).child("User").child("Token").setValue(token);
-        for (int i = 0; i < cartlistProduct.size(); i++)
-        {
-            Product oProduct = cartlistProduct.get(i);
-            //do something with i
-            // do something with object
-            //ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
-            mFirebaseDatabase.child(OrderId).child("Product"+i).setValue(oProduct);
-           // imageUrlUtils.removeCartListProduct(i);
-            //Decrease notification count
-            MainActivity.notificationCountCart--;
-        }
-
-        //ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
-        //cartlistProduct =imageUrlUtils.getCartListProduct();
-        //recyclerView.setAdapter(new CartListActivity.SimpleStringRecyclerViewAdapter(recyclerView, cartlistProduct));
-        //notifyDataSetChanged();
-//        notifyAll();
-       // Toast.makeText(mContext, "Successfully Checkout", Toast.LENGTH_SHORT).show();
-        SendNotification(token,"Order Status","Your Order has been successfully Checkout");
-        ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
-        imageUrlUtils.removeCartListAllProducts();
-        MainActivity.notificationCountCart=0;
-        Intent intent = new Intent(CartListActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
-
-    private void SendNotification(String token,String title,String Message) {
-        NotifyData oNotifyData=new NotifyData(title,Message);
-        Message oMessage=new Message(token,oNotifyData,"");
-        Call<Message> callresponse= ApiUtils.getAPIService(Constants.BASEURLFCM).sendMessage(oMessage);
-        callresponse.enqueue(new Callback<Message>() {
-            @Override
-            public void onResponse(Call<Message> call, Response<Message> response) {
-
-                Log.d("Response ", "onResponse");
-                //t1.setText("Notification sent");
-                Message message = response.body();
-                if ( response.code()==201){
-                    Toast.makeText(CartListActivity.this, "Successfully send", Toast.LENGTH_SHORT).show();
-                }
-                // Log.d("message", message.getMessage_id());
-            }
-            @Override
-            public void onFailure(Call<Message> call, Throwable t) {
-                Log.d("Response ", "onFailure");
-                //t1.setText("Notification failure");
-            }
-        });
-    }
+//    private  void CreateOrder() {
+//        String token = FirebaseInstanceId.getInstance().getToken();
+//        // TODO
+//        // In real apps this userId should be fetched
+//        // by implementing firebase auth
+//      String  OrderId = mFirebaseDatabase.push().getKey();
+//        if (TextUtils.isEmpty(OrderId)) {
+//            OrderId = mFirebaseDatabase.push().getKey();
+//        }
+//        mFirebaseDatabase.child(OrderId).child("User").child("name").setValue("Ali");
+//        mFirebaseDatabase.child(OrderId).child("User").child("Email").setValue("abc@gmail.com");
+//        mFirebaseDatabase.child(OrderId).child("User").child("Phone").setValue("0095522555");
+//        mFirebaseDatabase.child(OrderId).child("User").child("Address").setValue("XYZ");
+//        mFirebaseDatabase.child(OrderId).child("User").child("Token").setValue(token);
+//        for (int i = 0; i < cartlistProduct.size(); i++)
+//        {
+//            Product oProduct = cartlistProduct.get(i);
+//            //do something with i
+//            // do something with object
+//            //ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
+//            mFirebaseDatabase.child(OrderId).child("Product"+i).setValue(oProduct);
+//           // imageUrlUtils.removeCartListProduct(i);
+//            //Decrease notification count
+//            MainActivity.notificationCountCart--;
+//        }
+//
+//        //ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
+//        //cartlistProduct =imageUrlUtils.getCartListProduct();
+//        //recyclerView.setAdapter(new CartListActivity.SimpleStringRecyclerViewAdapter(recyclerView, cartlistProduct));
+//        //notifyDataSetChanged();
+////        notifyAll();
+//       // Toast.makeText(mContext, "Successfully Checkout", Toast.LENGTH_SHORT).show();
+//        SendNotification(token,"Order Status","Your Order has been successfully Checkout");
+//        ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
+//        imageUrlUtils.removeCartListAllProducts();
+//        MainActivity.notificationCountCart=0;
+//        Intent intent = new Intent(CartListActivity.this, MainActivity.class);
+//        startActivity(intent);
+//    }
+//
+//    private void SendNotification(String token,String title,String Message) {
+//        NotifyData oNotifyData=new NotifyData(title,Message);
+//        Message oMessage=new Message(token,oNotifyData,"");
+//        Call<Message> callresponse= ApiUtils.getAPIService(Constants.BASEURLFCM).sendMessage(oMessage);
+//        callresponse.enqueue(new Callback<Message>() {
+//            @Override
+//            public void onResponse(Call<Message> call, Response<Message> response) {
+//
+//                Log.d("Response ", "onResponse");
+//                //t1.setText("Notification sent");
+//                Message message = response.body();
+//                if ( response.code()==201){
+//                    Toast.makeText(CartListActivity.this, "Successfully send", Toast.LENGTH_SHORT).show();
+//                }
+//                // Log.d("message", message.getMessage_id());
+//            }
+//            @Override
+//            public void onFailure(Call<Message> call, Throwable t) {
+//                Log.d("Response ", "onFailure");
+//                //t1.setText("Notification failure");
+//            }
+//        });
+//    }
 }

@@ -69,12 +69,7 @@ TextView mtvName=(TextView)findViewById(R.id.ProductName);
         textViewBuyNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ImageUrlUtils imageUrlUtils = new ImageUrlUtils();
-                imageUrlUtils.addCartListProduct(oProduct);
-                MainActivity.notificationCountCart++;
-                NotificationCountSetClass.setNotifyCount(MainActivity.notificationCountCart);
                 startActivity(new Intent(ItemDetailsActivity.this, CartListActivity.class));
-
             }
         });
 
